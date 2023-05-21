@@ -23,6 +23,7 @@ int Tensor::getRows(){
     return rows;
 }
 
+// Initialize Tensor values with samples from normal distribution
 void Tensor::normalDistInit(double mean=0.0, double std=1.0) {
     std::random_device rd;
     std::mt19937 gen(rd());
