@@ -137,3 +137,56 @@ void Tensor::softmax(){
     }
     values = std::move(probas);
 }
+
+Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
+    if (columns != T.getRows()){
+        std::cout << "Dot operation failed. Incompatible dimensions" << std::endl;
+        return Tensor(0,0);
+    }
+    int finalRows = rows;
+    int finalColumns = T.getColumns();
+    Tensor finalTensor(finalRows, finalColumns);
+
+    for (int i = 0; i < finalRows; i++) {
+        for (int j = 0; j < finalColumns; j++) {
+            double sum = 0.0;
+            for (int k = 0; k < columns; k++) {
+                sum += values[i][k] * T.getValue(k,j);
+            }
+            finalTensor.setValue(i,j,sum);
+        }
+    }
+    return finalTensor;
+}
+
+Tensor Tensor::operator+(Tensor& T){ // ADD
+    if (columns != T.getColumns() || rows != T.getRows()){
+        std::cout << "Add operation failed. Incompatible dimensions" << std::endl;
+        return Tensor(0,0);
+    }
+    Tensor finalTensor(rows, columns);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            double add_result = values[i][j] + T.getValue(i,j);
+            finalTensor.setValue(i,j,add_result);
+        }
+    }
+    return finalTensor;
+}
+
+Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
+    if (columns != T.getColumns() || rows != T.getRows()){
+        std::cout << "Substract operation failed. Incompatible dimensions" << std::endl;
+        return Tensor(0,0);
+    }
+    Tensor finalTensor(rows, columns);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            double add_result = values[i][j] - T.getValue(i,j);
+            finalTensor.setValue(i,j,add_result);
+        }
+    }
+    return finalTensor;
+}

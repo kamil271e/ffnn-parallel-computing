@@ -2,31 +2,31 @@
 #include "tensor.cpp"
 
 int main(){
-    Tensor T(2,3);
+    Tensor T(1,2);
     T.normalDistInit();
     T.display();
     std::cout<<std::endl;
-    
-    T.transpose();
-    T.display();
-    std::cout<<std::endl;
-    
-    T.flatten();
-    T.display();
 
-    int argmax = T.argmax();
-    std::cout << argmax << std::endl <<std::endl;
+    // Tensor V(2,2);
+    // V.normalDistInit();
+    // V.display();
+    // std::cout<<std::endl;
 
-    // T.relu();
-    // T.display();
+    // Tensor X = T * V;
+    // X.display();
+    // std::cout<<std::endl;
 
-    T.sigmoid();
-    T.display();
+    Tensor Z(1,2);
+    Z.normalDistInit();
+    Z.display();
     std::cout<<std::endl;
 
-    T.softmax();
-    T.display();
+    Tensor F = T + Z;
+    F.display();
     std::cout<<std::endl;
+
+    Tensor U = F - T;
+    U.display();
 
     return 0;
 }
