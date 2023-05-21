@@ -1,32 +1,10 @@
 #include <iostream>
 #include "tensor.cpp"
+#include "digit.cpp"
 
 int main(){
-    Tensor T(1,2);
-    T.normalDistInit();
-    T.display();
-    std::cout<<std::endl;
-
-    // Tensor V(2,2);
-    // V.normalDistInit();
-    // V.display();
-    // std::cout<<std::endl;
-
-    // Tensor X = T * V;
-    // X.display();
-    // std::cout<<std::endl;
-
-    Tensor Z(1,2);
-    Z.normalDistInit();
-    Z.display();
-    std::cout<<std::endl;
-
-    Tensor F = T + Z;
-    F.display();
-    std::cout<<std::endl;
-
-    Tensor U = F - T;
-    U.display();
-
+    std::vector<Digit> train_set = loadMNIST("../datasets/mnist_train.csv", 500);
+    train_set[1].display();
+    std::cout << "Label: " << train_set[1].label << std::endl;
     return 0;
 }
