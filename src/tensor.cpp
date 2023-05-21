@@ -1,6 +1,8 @@
 #include "../lib/tensor.hpp"
 #include <random>
 
+Tensor::Tensor(){}
+
 Tensor::Tensor(int rows, int columns) {
     this->rows = rows;
     this->columns = columns;
@@ -24,7 +26,7 @@ int Tensor::getRows(){
 }
 
 // Initialize Tensor values with samples from normal distribution
-void Tensor::normalDistInit(double mean=0.0, double std=1.0) {
+void Tensor::normalDistInit(double mean, double std) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<double> distribution(mean, std);
@@ -55,7 +57,7 @@ void Tensor::transpose() {
     values = std::move(transposed);
 }
 
-void Tensor::flatten(int axis=0) {
+void Tensor::flatten(int axis) {
     // numpy based: axis=0 -> column vector
     // axis=1 -> row vector
     int n = rows * columns;
@@ -85,7 +87,7 @@ void Tensor::flatten(int axis=0) {
     values = std::move(flattened);
 }
 
-int Tensor::argmax(int axis=0) {
+int Tensor::argmax(int axis) {
     int cur_argmax[2] = {-1,-1};
     double cur_max = -10000000;
     for (int i = 0; i < rows; i++){

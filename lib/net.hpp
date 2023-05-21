@@ -1,0 +1,18 @@
+#pragma once
+#include <iostream>
+#include <vector>
+#include "tensor.hpp"
+#include "digit.hpp"
+
+class Linear {
+public:
+    Linear(int, int, int, double);
+    void fit(std::vector<Digit>);
+    void pass_forward(Digit);
+    void init_weights();
+private:
+    int input_size, hidden_size, num_classes;
+    Tensor hidden_layer;
+    Tensor output_layer;
+    double lr;
+};
