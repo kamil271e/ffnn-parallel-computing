@@ -144,7 +144,7 @@ void Tensor::softmax(){
 Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
     if (columns != T.getRows()){
         std::cout << "Dot operation failed. Incompatible dimensions" << std::endl;
-        return Tensor(0,0);
+        return Tensor();
     }
     int finalRows = rows;
     int finalColumns = T.getColumns();
@@ -165,7 +165,7 @@ Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
 Tensor Tensor::operator+(Tensor& T){ // ADD
     if (columns != T.getColumns() || rows != T.getRows()){
         std::cout << "Add operation failed. Incompatible dimensions" << std::endl;
-        return Tensor(0,0);
+        return Tensor();
     }
     Tensor finalTensor(rows, columns);
 
@@ -181,7 +181,7 @@ Tensor Tensor::operator+(Tensor& T){ // ADD
 Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
     if (columns != T.getColumns() || rows != T.getRows()){
         std::cout << "Substract operation failed. Incompatible dimensions" << std::endl;
-        return Tensor(0,0);
+        return Tensor();
     }
     Tensor finalTensor(rows, columns);
 

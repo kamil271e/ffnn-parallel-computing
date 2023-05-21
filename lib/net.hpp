@@ -12,7 +12,8 @@ public:
     void init_weights();
 private:
     int input_size, hidden_size, num_classes;
-    Tensor hidden_layer;
-    Tensor output_layer;
+    Tensor hidden_weights;
+    Tensor output_weights;
     double lr;
+    int accurate_pred;
 };
