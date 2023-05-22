@@ -12,6 +12,7 @@ public:
     int getColumns();
     
     void initNorm(double mean=0.0, double std=1.0);
+    void ones();
     void display();
     void transpose();
     void flatten(int axis=0);
@@ -28,7 +29,7 @@ public:
 
     Tensor operator*(double);
     Tensor operator*(Tensor&);
-    Tensor operator&(Tensor&); // element-wise multiplication
+    Tensor operator&(Tensor&);
     Tensor operator+(Tensor&);
     Tensor operator-(Tensor&);
 private:

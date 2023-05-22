@@ -10,16 +10,12 @@ int main(){
     // Linear model(28*28, 500, 10, 0.01);
     // model.fit(train_set);
     Tensor T(2,2);
-    T.initNorm();
+    T.ones();
+    T.sigmoid();
     T.display();
     std::cout<<std::endl;
 
-    Tensor Y(2,2);
-    Y.initNorm();
-    Y.display();
-    std::cout<<std::endl;
-
-    Tensor S = T & Y;
-    S.display();
+    T.softmaxDerivative();
+    T.display();
     return 0;
 }

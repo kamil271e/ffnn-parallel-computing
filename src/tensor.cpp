@@ -37,6 +37,15 @@ void Tensor::initNorm(double mean, double std) {
     }
 }
 
+// Fill tensor with 1s
+void Tensor::ones(){
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            values[i][j] = 1.0;
+        }
+    }
+}
+
 void Tensor::display() {
     for (int i = 0; i < rows; i++) {
             std::cout << "[ ";
@@ -130,12 +139,14 @@ void Tensor::sigmoid(){
     }
 }
 
-void Tensor::sigmoidDerivative(){
-    // element wise multiplication needed
-}
+void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
+    Tensor all_ones(rows, columns);
+    all_ones.ones();
 
-void Tensor::softmaxDerivative(){
-    // TODO
+    Tensor substracted(rows, columns);
+    substracted = all_ones - (*this);
+
+    *this = *this & substracted;
 }
 
 void Tensor::softmax(){
@@ -155,6 +166,10 @@ void Tensor::softmax(){
         }
     }
     values = std::move(probas);
+}
+
+void Tensor::softmaxDerivative() {
+    sigmoidDerivative();
 }
 
 void Tensor::oneHotEncoding(int label){
