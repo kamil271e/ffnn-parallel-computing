@@ -26,7 +26,7 @@ int Tensor::getRows(){
 }
 
 // Initialize Tensor values with samples from normal distribution
-void Tensor::normalDistInit(double mean, double std) {
+void Tensor::initNorm(double mean, double std) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<double> distribution(mean, std);
@@ -114,12 +114,28 @@ void Tensor::relu() {
     }
 }
 
+void Tensor::reluDerivative() {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            values[i][j] = (values[i][j] <= 0.0) ? 0.0 : 1.0;
+        }
+    }
+}
+
 void Tensor::sigmoid(){
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
             values[i][j] = 1.0 / (1.0 + std::exp(-values[i][j]));
         }
     }
+}
+
+void Tensor::sigmoidDerivative(){
+    // element wise multiplication needed
+}
+
+void Tensor::softmaxDerivative(){
+    // TODO
 }
 
 void Tensor::softmax(){
@@ -164,6 +180,16 @@ void Tensor::crossEntropyError(Tensor labels){
     values = std::move(err);
 }
 
+Tensor Tensor::operator*(double scalar){ // SCALING
+    Tensor finalTensor(rows, columns);
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            finalTensor.setValue(i, j, values[i][j] * scalar);
+        }
+    }
+    return finalTensor;
+}
+
 Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
     if (columns != T.getRows()){
         std::cout << "Dot operation failed. Incompatible dimensions" << std::endl;
@@ -185,6 +211,22 @@ Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
     return finalTensor;
 }
 
+Tensor Tensor::operator&(Tensor& T){// ELEMENT-WISE MULTIPLICATION
+    if (columns != T.getColumns() || rows != T.getRows()){
+        std::cout << "Element-wise multiplication failed. Incompatible dimensions" <<std::endl;
+        return Tensor();
+    }
+    Tensor finalTensor(rows, columns);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            double product =  values[i][j] * T.getValue(i, j);
+            finalTensor.setValue(i, j, product);
+        }
+    }
+    return finalTensor;
+}
+
 Tensor Tensor::operator+(Tensor& T){ // ADD
     if (columns != T.getColumns() || rows != T.getRows()){
         std::cout << "Add operation failed. Incompatible dimensions" << std::endl;
@@ -195,8 +237,8 @@ Tensor Tensor::operator+(Tensor& T){ // ADD
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double add_result = values[i][j] + T.getValue(i,j);
-            finalTensor.setValue(i,j,add_result);
-        }
+            finalTensor.setValue(i, j, add_result);
+        } 
     }
     return finalTensor;
 }
@@ -210,8 +252,8 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            double add_result = values[i][j] - T.getValue(i,j);
-            finalTensor.setValue(i,j,add_result);
+            double substract_result = values[i][j] - T.getValue(i,j);
+            finalTensor.setValue(i, j, substract_result);
         }
     }
     return finalTensor;
