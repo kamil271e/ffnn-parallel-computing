@@ -141,6 +141,29 @@ void Tensor::softmax(){
     values = std::move(probas);
 }
 
+void Tensor::oneHotEncoding(int label){
+    if (columns > 1 || label > rows-1){ // applied to column vector
+        std::cout << "One hot encoding faied." << std::endl;
+        return;
+    }
+    values[label][0] = 1.0;
+}
+
+void Tensor::crossEntropyError(Tensor labels){
+    std::vector<std::vector<double>> err(rows, std::vector<double>(columns));
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            double label = labels.getValue(i, j);
+            double prediction = values[i][j];
+            const double epsilon = 1e-7; // in case prediciton = 0
+            prediction = std::max(epsilon, prediction); 
+            err[i][j] = -label * std::log(prediction);
+        }
+    }
+    values = std::move(err);
+}
+
 Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
     if (columns != T.getRows()){
         std::cout << "Dot operation failed. Incompatible dimensions" << std::endl;

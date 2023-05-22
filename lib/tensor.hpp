@@ -20,6 +20,8 @@ public:
     void relu();
     void sigmoid();
     void softmax();
+    void oneHotEncoding(int);
+    void crossEntropyError(Tensor);
 
     Tensor operator*(Tensor&);
     Tensor operator+(Tensor&);

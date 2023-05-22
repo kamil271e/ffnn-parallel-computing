@@ -20,8 +20,9 @@ void Linear::init_weights(){
 void Linear::fit(std::vector<Digit> digits){
     for(const Digit& digit: digits){
         pass_forward(digit);
+        break;
     }
-    std::cout << "Accuracy: " << (double)accurate_pred / (double)digits.size() << std::endl;
+    // std::cout << "Accuracy: " << (double)accurate_pred / (double)digits.size() << std::endl;
 }
 
 void Linear::pass_forward(Digit digit){
@@ -33,7 +34,19 @@ void Linear::pass_forward(Digit digit){
 
     Tensor output = output_weights * hidden_output;
     output.softmax();
+    output.display();
+    std::cout<<std::endl;
 
+    Tensor labels(10,1);
+    labels.oneHotEncoding(8);
+    labels.display();
+    std::cout<<std::endl;
+
+    output.crossEntropyError(labels);
+    Tensor gradTensor = output;
+    gradTensor.display();
+    std::cout<<std::endl;
+    
     int predicted = output.argmax();
     if (digit.label == predicted){
         accurate_pred++;
