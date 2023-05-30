@@ -11,31 +11,79 @@ Linear::Linear(int input_size, int hidden_size, int num_classes, double lr){
 
 void Linear::init_weights(){
     hidden_weights = Tensor(hidden_size, input_size);
-    hidden_weights.normalDistInit();
+    hidden_weights.initUniform();
 
     output_weights = Tensor(num_classes, hidden_size);
-    output_weights.normalDistInit();
+    output_weights.initNorm();
 }
 
 void Linear::fit(std::vector<Digit> digits){
     for(const Digit& digit: digits){
-        pass_forward(digit);
+        forward_propagation(digit);
+        backward_propagation(digit.label);
     }
-    std::cout << "Accuracy: " << (double)accurate_pred / (double)digits.size() << std::endl;
+    std::cout << "Train accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
 
-void Linear::pass_forward(Digit digit){
-    Tensor input = digit.data;
-    input.flatten();
-
-    Tensor hidden_output = hidden_weights * input;
-    hidden_output.relu();
-
-    Tensor output = output_weights * hidden_output;
-    output.softmax();
-
-    int predicted = output.argmax();
-    if (digit.label == predicted){
-        accurate_pred++;
+void Linear::predict(std::vector<Digit> digits){
+    accurate_pred = 0;
+    for(const Digit& digit: digits){
+        forward_propagation(digit);
     }
+    std::cout << "Test accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
+
+void Linear::forward_propagation(Digit digit){
+    inputs = digit.data;
+    inputs.flatten();
+
+    hidden_outputs = hidden_weights * inputs;
+    hidden_outputs.relu();
+
+    outputs = output_weights * hidden_outputs;
+    outputs.softmax();
+
+    if (digit.label == outputs.argmax()) accurate_pred++;
+}
+
+void Linear::backward_propagation(int target){
+    labels = Tensor(num_classes, 1);
+    labels.oneHotEncoding(target);
+
+    output_err = labels - outputs;
+
+    output_weights.transpose();
+
+    hidden_err = output_weights * output_err;
+
+    outputs.softmaxDerivative();
+
+    output_gradients = outputs & output_err;
+
+    hidden_outputs.transpose();
+
+    output_gradients = output_gradients * hidden_outputs;
+
+    output_gradients = output_gradients * lr;
+
+    output_weights.transpose();
+
+    output_weights = output_weights + output_gradients;
+
+    ///////////////////////////////////////////////////
+
+    hidden_outputs.reluDerivative();
+
+    hidden_outputs.transpose();
+
+    hidden_gradients = hidden_outputs & hidden_err;
+
+    inputs.transpose();
+
+    hidden_gradients = hidden_gradients * inputs;
+
+    hidden_gradients = hidden_gradients * lr;
+
+    hidden_weights = hidden_weights + hidden_gradients; 
+}
+
