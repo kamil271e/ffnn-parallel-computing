@@ -80,9 +80,9 @@ void Tensor::transpose() {
     values = std::move(transposed);
 }
 
+// numpy based: axis=0 -> column vector
+// axis=1 -> row vector
 void Tensor::flatten(int axis) {
-    // numpy based: axis=0 -> column vector
-    // axis=1 -> row vector
     int n = rows * columns;
     std::vector<std::vector<double>> flattened;
     if (axis==0){
@@ -184,19 +184,6 @@ void Tensor::sigmoid(){
         }
     }
 }
-
-// void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
-//     Tensor all_ones(rows, columns);
-//     all_ones.ones();
-
-//     Tensor sigmoid_output = *this;
-//     sigmoid_output.sigmoid();
-
-//     Tensor substracted(rows, columns);
-//     substracted = all_ones - sigmoid_output;
-
-//     *this = sigmoid_output & substracted;
-// }
 
 void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
     Tensor all_ones(rows, columns);

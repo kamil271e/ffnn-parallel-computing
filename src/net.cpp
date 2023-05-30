@@ -14,64 +14,51 @@ void Linear::init_weights(){
     hidden_weights.initUniform();
 
     output_weights = Tensor(num_classes, hidden_size);
-    output_weights.initUniform();
     output_weights.initNorm();
 }
 
 void Linear::fit(std::vector<Digit> digits){
-    int  i = 0;
     for(const Digit& digit: digits){
-        fit_batch(digit);
-        i++;
+        forward_propagation(digit);
+        backward_propagation(digit.label);
     }
-    std::cout << "Train accuracy: " << (double)accurate_pred  / i << std::endl;
+    std::cout << "Train accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
 
 void Linear::predict(std::vector<Digit> digits){
     accurate_pred = 0;
-    int i = 0;
     for(const Digit& digit: digits){
-        fit_batch(digit);
-        i++;
+        forward_propagation(digit);
     }
-    std::cout << "Test accuracy: " << (double)accurate_pred << " " <<  i << 
-    " " << (double)accurate_pred / i << std::endl;
+    std::cout << "Test accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
 
-void Linear::fit_batch(Digit digit){
-    
-    // FORWARD PROPAGATION
-    Tensor inputs = digit.data;
+void Linear::forward_propagation(Digit digit){
+    inputs = digit.data;
     inputs.flatten();
 
-    Tensor hidden_outputs = hidden_weights * inputs;
+    hidden_outputs = hidden_weights * inputs;
+    hidden_outputs.relu();
 
-    hidden_outputs.sigmoid();
+    outputs = output_weights * hidden_outputs;
+    outputs.softmax();
 
-    Tensor outputs = output_weights * hidden_outputs;
-    
-    outputs.sigmoid();
-    
     if (digit.label == outputs.argmax()) accurate_pred++;
+}
 
-    int predicted = outputs.argmax();
-    
-    // BACKWARD PROPAGATION
-    Tensor labels(num_classes, 1);
-    labels.oneHotEncoding(digit.label);
+void Linear::backward_propagation(int target){
+    labels = Tensor(num_classes, 1);
+    labels.oneHotEncoding(target);
 
-    Tensor final_outputs = outputs;
+    output_err = labels - outputs;
 
-    Tensor output_err = labels - final_outputs;
-    outputs.crossEntropyError(labels);
-    
     output_weights.transpose();
 
-    Tensor hidden_err = output_weights * output_err;
+    hidden_err = output_weights * output_err;
 
-    final_outputs.softmaxDerivative();
+    outputs.softmaxDerivative();
 
-    Tensor output_gradients = final_outputs & output_err;
+    output_gradients = outputs & output_err;
 
     hidden_outputs.transpose();
 
@@ -85,11 +72,11 @@ void Linear::fit_batch(Digit digit){
 
     ///////////////////////////////////////////////////
 
-    hidden_outputs.sigmoidDerivative();
+    hidden_outputs.reluDerivative();
 
     hidden_outputs.transpose();
 
-    Tensor hidden_gradients = hidden_outputs & hidden_err;
+    hidden_gradients = hidden_outputs & hidden_err;
 
     inputs.transpose();
 
@@ -98,5 +85,5 @@ void Linear::fit_batch(Digit digit){
     hidden_gradients = hidden_gradients * lr;
 
     hidden_weights = hidden_weights + hidden_gradients; 
-
 }
+
