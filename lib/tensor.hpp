@@ -8,7 +8,6 @@ public:
     Tensor();
     Tensor(int, int);
     void setValue(int, int, double);
-    double getValue(int, int);
     int getRows();
     int getColumns();
     
@@ -36,6 +35,7 @@ public:
     Tensor operator&(Tensor&);
     Tensor operator+(Tensor&);
     Tensor operator-(Tensor&);
+    double operator()(int, int);
 private:
     int rows, columns;
     std::vector<std::vector<double>> values;

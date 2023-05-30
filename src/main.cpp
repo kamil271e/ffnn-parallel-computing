@@ -10,5 +10,7 @@ int main(){
     Linear model(28*28, 100, 10, 0.03);
     model.fit(train_set);
     model.predict(test_set);
+
+    model.save_weights("hidden_weights.txt");
     return 0;
 }

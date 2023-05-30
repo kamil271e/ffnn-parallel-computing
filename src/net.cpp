@@ -87,3 +87,34 @@ void Linear::backward_propagation(int target){
     hidden_weights = hidden_weights + hidden_gradients; 
 }
 
+void Linear::save_weights(std::string path){
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        std::cout << "Failed to open: " << path << std::endl;
+        return;
+    }
+
+    file << hidden_size << " " << input_size << std::endl;
+    for (int i  = 0; i < hidden_size; i++){
+        for (int j = 0; j < input_size; j++){
+            file << hidden_weights(i,j) << " ";
+        } file << std::endl;
+    }
+    
+    file << num_classes << " " << hidden_size << std::endl;
+    for (int i = 0; i < num_classes; i++){
+        for (int j = 0; j < hidden_size; j++){
+            file << output_weights(i,j) << " ";
+        } file << std::endl;
+    }
+
+    file.close();
+}
+
+void Linear::load_weights(std::string path){
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cout << "Failed to open: " << path << std::endl;
+        return;
+    }
+}

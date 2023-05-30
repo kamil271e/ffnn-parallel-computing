@@ -10,7 +10,7 @@ void Digit::display(){ // pretty printing
     for (int i = 0; i < data.getRows(); i++){
         for (int j = 0; j < data.getColumns(); j++){
             std::cout.width(7);
-            std::cout << std::right << data.getValue(i,j) << " ";
+            std::cout << std::right << data(i,j) << " ";
         } std::cout << std::endl << std::endl;
     }
 }

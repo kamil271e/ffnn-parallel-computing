@@ -13,10 +13,6 @@ void Tensor::setValue(int i, int j, double val){
     values[i][j] = val;
 }
 
-double Tensor::getValue(int i, int j){
-    return values[i][j];
-}
-
 int Tensor::getColumns(){
     return columns;
 }
@@ -231,7 +227,7 @@ void Tensor::crossEntropyError(Tensor labels){
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            double label = labels.getValue(i, j);
+            double label = labels(i, j);
             double prediction = values[i][j];
             const double epsilon = 1e-7; // in case prediciton = 0
             prediction = std::max(epsilon, prediction); 
@@ -264,7 +260,7 @@ Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
         for (int j = 0; j < finalColumns; j++) {
             double sum = 0.0;
             for (int k = 0; k < columns; k++) {
-                sum += values[i][k] * T.getValue(k,j);
+                sum += values[i][k] * T(k,j);
             }
             finalTensor.setValue(i,j,sum);
         }
@@ -281,7 +277,7 @@ Tensor Tensor::operator&(Tensor& T){// ELEMENT-WISE MULTIPLICATION
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            double product =  values[i][j] * T.getValue(i, j);
+            double product =  values[i][j] * T(i, j);
             finalTensor.setValue(i, j, product);
         }
     }
@@ -297,7 +293,7 @@ Tensor Tensor::operator+(Tensor& T){ // ADD
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            double add_result = values[i][j] + T.getValue(i,j);
+            double add_result = values[i][j] + T(i,j);
             finalTensor.setValue(i, j, add_result);
         } 
     }
@@ -313,9 +309,13 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            double substract_result = values[i][j] - T.getValue(i,j);
+            double substract_result = values[i][j] - T(i,j);
             finalTensor.setValue(i, j, substract_result);
         }
     }
     return finalTensor;
+}
+
+double Tensor::operator()(int i, int j) {
+    return values[i][j];
 }
