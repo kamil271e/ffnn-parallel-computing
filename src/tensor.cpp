@@ -37,6 +37,20 @@ void Tensor::initNorm(double mean, double std) {
     }
 }
 
+// Initialize tensor values with samples from uniform distribution
+void Tensor::initUniform(){
+    double min = -1.0 / sqrt(rows);
+	double max = 1.0 / sqrt(rows);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> distribution(min, max);
+    for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < columns; j++) {
+			values[i][j] = distribution(gen);
+		}
+	}
+}
+
 // Fill tensor with 1s
 void Tensor::ones(){
     for (int i = 0; i < rows; i++){
@@ -115,6 +129,38 @@ int Tensor::argmax(int axis) {
     return cur_argmax[axis];
 }
 
+double Tensor::maxval(int axis) {
+    double cur_max = -10000000;
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            if (values[i][j] > cur_max){
+                cur_max = values[i][j];
+            }
+        }
+    }
+    if(axis != 0 && axis != 1){
+        std::cout << "Maxval operation failed. Axis parameter should be 0 or 1." << std::endl;
+        return -1;
+    }
+    return cur_max;
+}
+
+double Tensor::minval(int axis) {
+    double cur_min = 10000000;
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            if (values[i][j] < cur_min){
+                cur_min = values[i][j];
+            }
+        }
+    }
+    if(axis != 0 && axis != 1){
+        std::cout << "Minval operation failed. Axis parameter should be 0 or 1." << std::endl;
+        return -1;
+    }
+    return cur_min;
+}
+
 void Tensor::relu() {
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
@@ -138,6 +184,19 @@ void Tensor::sigmoid(){
         }
     }
 }
+
+// void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
+//     Tensor all_ones(rows, columns);
+//     all_ones.ones();
+
+//     Tensor sigmoid_output = *this;
+//     sigmoid_output.sigmoid();
+
+//     Tensor substracted(rows, columns);
+//     substracted = all_ones - sigmoid_output;
+
+//     *this = sigmoid_output & substracted;
+// }
 
 void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
     Tensor all_ones(rows, columns);

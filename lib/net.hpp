@@ -10,6 +10,7 @@ public:
     void fit(std::vector<Digit>);
     void fit_batch(Digit);
     void init_weights();
+    void predict(std::vector<Digit>);
 private:
     int input_size, hidden_size, num_classes;
     Tensor hidden_weights;
