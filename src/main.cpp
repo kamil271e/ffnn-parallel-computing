@@ -1,17 +1,20 @@
 #include <iostream>
 #include <chrono>
- #include "tensor.cpp"
+#include "tensor.cpp"
 #include "digit.cpp"
 #include "net.cpp"
 
-int main(int argc, char** argv){
+int main(int argc, char** argv){ 
     int train_size;
     std::vector<Digit> train_set;
+    int input_size = 28*28;
+    int num_classes = 10;
+    double lr = 0.03;
 
     if (argc < 2){ // REGULAR TRAINING
-        train_size = 500;
+        train_size = 1000;
         train_set = loadMNIST("datasets/mnist_train.csv", train_size);
-        NeuralNetwork model(28*28, 400, 10, 0.03);
+        NeuralNetwork model(input_size, 200, num_classes, lr);
         double accuracy = model.fit(train_set);
         std::cout << "Train accuracy: " << accuracy << std::endl;
     }
@@ -27,14 +30,15 @@ int main(int argc, char** argv){
 
         for (int i = 2; i < argc; i++){
             int neurons = std::stoi(argv[i]);
-            NeuralNetwork model(28*28, neurons, 10, 0.03);
+            NeuralNetwork model(input_size, neurons, num_classes, lr);
+            
             auto start = std::chrono::high_resolution_clock::now();
             double accuracy = model.fit(train_set);
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-            std::cout << train_size << " " << duration.count() << " " << accuracy << std::endl;
-            // store num of neurons, duration time and accuracy in file
+            
             file << neurons << " " << duration.count() << " " << accuracy << std::endl;
+            // std::cout << train_size << " " << duration.count() << " " << accuracy << std::endl;
         }
         file.close();
     }

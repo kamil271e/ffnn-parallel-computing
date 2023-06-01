@@ -12,7 +12,7 @@ for file in os.listdir('times'):
         while line:
             neuron, execution_time, accuracy = line.split(' ')
             neurons.append(int(neuron))
-            times.append(int(execution_time))
+            times.append(float(execution_time) / 10**3)
             accuracies.append(float(accuracy))
             line = f.readline()
 
@@ -20,8 +20,8 @@ for file in os.listdir('times'):
         plt.plot(neurons, times, '-o')
         plt.title(f'Time of execution [train size: {train_size}]')
         plt.xlabel('No. of neurons in hidden layer')
-        plt.ylabel('Time [ms]')
-        plt.savefig(f'plots/time_{train_size}.jpg')
+        plt.ylabel('Time [s]')
+        plt.savefig(f'plots/time_{train_size}.svg')
         plt.clf()
 
         # Accuracy plot
@@ -29,7 +29,7 @@ for file in os.listdir('times'):
         plt.title(f'Train accuracy [train size: {train_size}]')
         plt.xlabel('No. of neurons in hidden layer')
         plt.ylabel('Accuracy')
-        plt.savefig(f'plots/accuracy_{train_size}.jpg')
+        plt.savefig(f'plots/accuracy_{train_size}.svg')
         plt.clf()
 
 print('Plots generated and saved.')
