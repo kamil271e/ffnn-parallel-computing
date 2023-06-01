@@ -87,34 +87,65 @@ void Linear::backward_propagation(int target){
     hidden_weights = hidden_weights + hidden_gradients; 
 }
 
-void Linear::save_weights(std::string path){
+void Linear::save_weights(std::string path) {
     std::ofstream file(path);
     if (!file.is_open()) {
         std::cout << "Failed to open: " << path << std::endl;
         return;
     }
 
-    file << hidden_size << " " << input_size << std::endl;
-    for (int i  = 0; i < hidden_size; i++){
-        for (int j = 0; j < input_size; j++){
-            file << hidden_weights(i,j) << " ";
-        } file << std::endl;
+    file << hidden_weights.getRows() << " " << hidden_weights.getColumns() << std::endl;
+    for (int i = 0; i < hidden_weights.getRows(); i++) {
+        for (int j = 0; j < hidden_weights.getColumns(); j++) {
+            file << hidden_weights(i, j) << " ";
+        }
+        file << std::endl;
     }
-    
-    file << num_classes << " " << hidden_size << std::endl;
-    for (int i = 0; i < num_classes; i++){
-        for (int j = 0; j < hidden_size; j++){
-            file << output_weights(i,j) << " ";
-        } file << std::endl;
+
+    file << output_weights.getRows() << " " << output_weights.getColumns() << std::endl;
+    for (int i = 0; i < output_weights.getRows(); i++) {
+        for (int j = 0; j < output_weights.getColumns(); j++) {
+            file << output_weights(i, j) << " ";
+        }
+        file << std::endl;
     }
 
     file.close();
 }
 
-void Linear::load_weights(std::string path){
+void Linear::load_weights(std::string path) {
     std::ifstream file(path);
     if (!file.is_open()) {
         std::cout << "Failed to open: " << path << std::endl;
         return;
     }
+
+    int weights_rows, weights_cols;
+    Tensor* loaded_weights;
+
+    for (int k = 0; k < 2; k++) {
+        if (k == 0) {
+            loaded_weights = &hidden_weights;
+        } else {
+            loaded_weights = &output_weights;
+        }
+
+        file >> weights_rows;
+        file >> weights_cols;
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if (weights_rows != (*loaded_weights).getRows() || weights_cols != (*loaded_weights).getColumns()) {
+            std::cout << "Invalid shape of weights to load" << std::endl;
+            return;
+        }
+
+        for (int i = 0; i < (*loaded_weights).getRows(); i++) {
+            for (int j = 0; j < (*loaded_weights).getColumns(); j++) {
+                file >> (*loaded_weights)(i, j);
+            }
+            file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+
+    file.close();
 }

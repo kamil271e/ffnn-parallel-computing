@@ -9,10 +9,6 @@ Tensor::Tensor(int rows, int columns) {
     values.resize(rows, std::vector<double>(columns));
 }
 
-void Tensor::setValue(int i, int j, double val){
-    values[i][j] = val;
-}
-
 int Tensor::getColumns(){
     return columns;
 }
@@ -241,7 +237,7 @@ Tensor Tensor::operator*(double scalar){ // SCALING
     Tensor finalTensor(rows, columns);
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
-            finalTensor.setValue(i, j, values[i][j] * scalar);
+            finalTensor(i,j) = values[i][j] * scalar;
         }
     }
     return finalTensor;
@@ -262,7 +258,7 @@ Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
             for (int k = 0; k < columns; k++) {
                 sum += values[i][k] * T(k,j);
             }
-            finalTensor.setValue(i,j,sum);
+            finalTensor(i,j) = sum;
         }
     }
     return finalTensor;
@@ -278,7 +274,7 @@ Tensor Tensor::operator&(Tensor& T){// ELEMENT-WISE MULTIPLICATION
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double product =  values[i][j] * T(i, j);
-            finalTensor.setValue(i, j, product);
+            finalTensor(i,j) = product;
         }
     }
     return finalTensor;
@@ -294,7 +290,7 @@ Tensor Tensor::operator+(Tensor& T){ // ADD
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double add_result = values[i][j] + T(i,j);
-            finalTensor.setValue(i, j, add_result);
+            finalTensor(i,j) = add_result;
         } 
     }
     return finalTensor;
@@ -310,12 +306,12 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double substract_result = values[i][j] - T(i,j);
-            finalTensor.setValue(i, j, substract_result);
+            finalTensor(i,j) = substract_result;
         }
     }
     return finalTensor;
 }
 
-double Tensor::operator()(int i, int j) {
+double& Tensor::operator()(int i, int j) {
     return values[i][j];
 }
