@@ -2,3 +2,5 @@
 *.out
 datasets
 *.txt
+times
+plots

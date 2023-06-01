@@ -17,20 +17,22 @@ void NeuralNetwork::init_weights(){
     output_weights.initNorm();
 }
 
-void NeuralNetwork::fit(std::vector<Digit> digits){
+double NeuralNetwork::fit(std::vector<Digit> digits){
     for(const Digit& digit: digits){
         forward_propagation(digit);
         backward_propagation(digit.label);
     }
-    std::cout << "Train accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
+    double accuracy = (double)accurate_pred  / (double)digits.size();
+    return accuracy;
 }
 
-void NeuralNetwork::predict(std::vector<Digit> digits){
+double NeuralNetwork::predict(std::vector<Digit> digits){
     accurate_pred = 0;
     for(const Digit& digit: digits){
         forward_propagation(digit);
     }
-    std::cout << "Test accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
+    double accuracy = (double)accurate_pred  / (double)digits.size();
+    return accuracy;
 }
 
 void NeuralNetwork::forward_propagation(Digit digit){

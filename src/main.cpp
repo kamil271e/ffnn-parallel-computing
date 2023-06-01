@@ -1,18 +1,47 @@
 #include <iostream>
+#include <chrono>
 #include "tensor.cpp"
 #include "digit.cpp"
 #include "net.cpp"
 
-int main(){
-    std::vector<Digit> train_set = loadMNIST("../datasets/mnist_train.csv", 1000);
-    std::vector<Digit> test_set = loadMNIST("../datasets/mnist_test.csv", 100);
+int main(int argc, char** argv){ 
+    int train_size;
+    std::vector<Digit> train_set;
+    int input_size = 28*28;
+    int num_classes = 10;
+    double lr = 0.03;
 
-    NeuralNetwork model(28*28, 100, 10, 0.03);
-    // model.fit(train_set);
+    if (argc < 2){ // REGULAR TRAINING
+        train_size = 1000;
+        train_set = loadMNIST("datasets/mnist_train.csv", train_size);
+        NeuralNetwork model(input_size, 200, num_classes, lr);
+        double accuracy = model.fit(train_set);
+        std::cout << "Train accuracy: " << accuracy << std::endl;
+    }
+    else{ // TESTING FOR DIFFERENT TRAIN SIZES
+        train_size = std::stoi(argv[1]);
+        train_set = loadMNIST("datasets/mnist_train.csv", train_size);
+        std::string path = "times/" + std::to_string(train_size) + ".txt";
+        std::ofstream file(path);
+        if (!file.is_open()) {
+            std::cout << "Failed to open: " << path << std::endl;
+            return -1;
+        }
+
+        for (int i = 2; i < argc; i++){
+            int neurons = std::stoi(argv[i]);
+            NeuralNetwork model(input_size, neurons, num_classes, lr);
+            
+            auto start = std::chrono::high_resolution_clock::now();
+            double accuracy = model.fit(train_set);
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+            
+            file << neurons << " " << duration.count() << " " << accuracy << std::endl;
+            // std::cout << train_size << " " << duration.count() << " " << accuracy << std::endl;
+        }
+        file.close();
+    }
     
-    model.load_weights("weights_.txt");
-    model.predict(test_set);
-
-    // model.save_weights("weights_.txt");
     return 0;
 }
