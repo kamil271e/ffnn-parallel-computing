@@ -9,7 +9,6 @@ class Digit {
 public:
     Digit(Tensor&, int);
     void display();
-    
+    Tensor data;  
     int label;
-    Tensor data;
 };

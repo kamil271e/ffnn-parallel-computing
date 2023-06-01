@@ -10,7 +10,7 @@ void Digit::display(){ // pretty printing
     for (int i = 0; i < data.getRows(); i++){
         for (int j = 0; j < data.getColumns(); j++){
             std::cout.width(7);
-            std::cout << std::right << data.getValue(i,j) << " ";
+            std::cout << std::right << data(i,j) << " ";
         } std::cout << std::endl << std::endl;
     }
 }
@@ -37,7 +37,7 @@ std::vector<Digit> loadMNIST(std::string path, int n_samples) {
         int j = 0;
         while (std::getline(iss, token, ',')) {
             double pixel = std::stod(token) / 255.0; // pixel normalization
-            img.setValue(j / 28, j % 28, pixel);
+            img(j/28, j%28) = pixel;
             j++;
         }
         Digit digit(img, label);

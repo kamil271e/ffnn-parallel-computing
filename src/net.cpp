@@ -1,6 +1,6 @@
 #include "../lib/net.hpp"
 
-Linear::Linear(int input_size, int hidden_size, int num_classes, double lr){
+NeuralNetwork::NeuralNetwork(int input_size, int hidden_size, int num_classes, double lr){
     this->input_size = input_size;
     this->hidden_size = hidden_size;
     this->num_classes = num_classes;
@@ -9,7 +9,7 @@ Linear::Linear(int input_size, int hidden_size, int num_classes, double lr){
     init_weights();
 }
 
-void Linear::init_weights(){
+void NeuralNetwork::init_weights(){
     hidden_weights = Tensor(hidden_size, input_size);
     hidden_weights.initUniform();
 
@@ -17,7 +17,7 @@ void Linear::init_weights(){
     output_weights.initNorm();
 }
 
-void Linear::fit(std::vector<Digit> digits){
+void NeuralNetwork::fit(std::vector<Digit> digits){
     for(const Digit& digit: digits){
         forward_propagation(digit);
         backward_propagation(digit.label);
@@ -25,7 +25,7 @@ void Linear::fit(std::vector<Digit> digits){
     std::cout << "Train accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
 
-void Linear::predict(std::vector<Digit> digits){
+void NeuralNetwork::predict(std::vector<Digit> digits){
     accurate_pred = 0;
     for(const Digit& digit: digits){
         forward_propagation(digit);
@@ -33,7 +33,7 @@ void Linear::predict(std::vector<Digit> digits){
     std::cout << "Test accuracy: " << (double)accurate_pred  / (double)digits.size() << std::endl;
 }
 
-void Linear::forward_propagation(Digit digit){
+void NeuralNetwork::forward_propagation(Digit digit){
     inputs = digit.data;
     inputs.flatten();
 
@@ -46,7 +46,7 @@ void Linear::forward_propagation(Digit digit){
     if (digit.label == outputs.argmax()) accurate_pred++;
 }
 
-void Linear::backward_propagation(int target){
+void NeuralNetwork::backward_propagation(int target){
     labels = Tensor(num_classes, 1);
     labels.oneHotEncoding(target);
 
@@ -87,3 +87,65 @@ void Linear::backward_propagation(int target){
     hidden_weights = hidden_weights + hidden_gradients; 
 }
 
+void NeuralNetwork::save_weights(std::string path) {
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        std::cout << "Failed to open: " << path << std::endl;
+        return;
+    }
+
+    file << hidden_weights.getRows() << " " << hidden_weights.getColumns() << std::endl;
+    for (int i = 0; i < hidden_weights.getRows(); i++) {
+        for (int j = 0; j < hidden_weights.getColumns(); j++) {
+            file << hidden_weights(i, j) << " ";
+        }
+        file << std::endl;
+    }
+
+    file << output_weights.getRows() << " " << output_weights.getColumns() << std::endl;
+    for (int i = 0; i < output_weights.getRows(); i++) {
+        for (int j = 0; j < output_weights.getColumns(); j++) {
+            file << output_weights(i, j) << " ";
+        }
+        file << std::endl;
+    }
+
+    file.close();
+}
+
+void NeuralNetwork::load_weights(std::string path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cout << "Failed to open: " << path << std::endl;
+        return;
+    }
+
+    int weights_rows, weights_cols;
+    Tensor* loaded_weights;
+
+    for (int k = 0; k < 2; k++) {
+        if (k == 0) {
+            loaded_weights = &hidden_weights;
+        } else {
+            loaded_weights = &output_weights;
+        }
+
+        file >> weights_rows;
+        file >> weights_cols;
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if (weights_rows != (*loaded_weights).getRows() || weights_cols != (*loaded_weights).getColumns()) {
+            std::cout << "Invalid shape of weights to load" << std::endl;
+            return;
+        }
+
+        for (int i = 0; i < (*loaded_weights).getRows(); i++) {
+            for (int j = 0; j < (*loaded_weights).getColumns(); j++) {
+                file >> (*loaded_weights)(i, j);
+            }
+            file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+
+    file.close();
+}

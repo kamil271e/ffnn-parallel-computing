@@ -4,14 +4,16 @@
 #include "tensor.hpp"
 #include "digit.hpp"
 
-class Linear {
+class NeuralNetwork {
 public:
-    Linear(int, int, int, double);
+    NeuralNetwork(int, int, int, double);
     void init_weights();
     void fit(std::vector<Digit>);
     void forward_propagation(Digit);
     void backward_propagation(int);
     void predict(std::vector<Digit>);
+    void save_weights(std::string);
+    void load_weights(std::string);
 private:
     int input_size, hidden_size, num_classes;
     Tensor inputs;
