@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 #include "tensor.cpp"
 #include "digit.cpp"
 #include "net.cpp"
@@ -12,17 +11,18 @@ int main(int argc, char** argv){
     int num_classes = 10;
     double lr = 0.01;
     bool parallel = true;
+    double start, stop, duration; 
     omp_set_num_threads(NUM_THREADS);
 
     if (argc < 2){ // REGULAR TRAINING
         train_size = 1000;
         train_set = loadMNIST("datasets/mnist_train.csv", train_size, parallel);
         NeuralNetwork model(input_size, 500, num_classes, lr, parallel);
-        auto start = std::chrono::high_resolution_clock::now();
+        start = omp_get_wtime();
         double accuracy = model.fit(train_set);
-        auto stop = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);        
-        std::cout << duration.count() << " " << accuracy << std::endl;
+        stop = omp_get_wtime();
+        duration = stop -start;       
+        std::cout << duration << " " << accuracy << std::endl;
     }
     else{ // TESTING FOR DIFFERENT TRAIN SIZES
         train_size = std::stoi(argv[1]);
@@ -38,12 +38,12 @@ int main(int argc, char** argv){
             int neurons = std::stoi(argv[i]);
             NeuralNetwork model(input_size, neurons, num_classes, lr);
             
-            auto start = std::chrono::high_resolution_clock::now();
+            start = omp_get_wtime();
             double accuracy = model.fit(train_set);
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+            stop = omp_get_wtime();
+            duration = stop -start;    
             
-            file << neurons << " " << duration.count() << " " << accuracy << std::endl;
+            file << neurons << " " << duration << " " << accuracy << std::endl;
             // std::cout << train_size << " " << duration.count() << " " << accuracy << std::endl;
         }
         file.close();

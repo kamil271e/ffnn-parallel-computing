@@ -12,7 +12,7 @@ for file in os.listdir('times'):
         while line:
             neuron, execution_time, accuracy = line.split(' ')
             neurons.append(int(neuron))
-            times.append(float(execution_time) / 10**3)
+            times.append(float(execution_time))
             accuracies.append(float(accuracy))
             line = f.readline()
 
