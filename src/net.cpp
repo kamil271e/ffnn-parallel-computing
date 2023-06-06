@@ -1,19 +1,20 @@
 #include "../lib/net.hpp"
 
-NeuralNetwork::NeuralNetwork(int input_size, int hidden_size, int num_classes, double lr){
+NeuralNetwork::NeuralNetwork(int input_size, int hidden_size, int num_classes, double lr, bool parallel){
     this->input_size = input_size;
     this->hidden_size = hidden_size;
     this->num_classes = num_classes;
     this->lr = lr;
+    this->parallel = parallel;
     this->accurate_pred = 0;
     init_weights();
 }
 
 void NeuralNetwork::init_weights(){
-    hidden_weights = Tensor(hidden_size, input_size);
+    hidden_weights = Tensor(hidden_size, input_size, parallel);
     hidden_weights.initUniform();
 
-    output_weights = Tensor(num_classes, hidden_size);
+    output_weights = Tensor(num_classes, hidden_size, parallel);
     output_weights.initNorm();
 }
 
@@ -52,7 +53,7 @@ void NeuralNetwork::backward_propagation(int target){
     labels = Tensor(num_classes, 1);
     labels.oneHotEncoding(target);
 
-    output_err = labels - outputs;
+    output_err = (labels - outputs) * 2; // derivative of (y_hat-y)^2
 
     output_weights.transpose();
 
