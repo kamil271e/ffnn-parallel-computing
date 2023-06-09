@@ -6,7 +6,7 @@
 class Tensor {
 public:
     Tensor();
-    Tensor(int, int);
+    Tensor(int, int, bool parallel=false);
     int getRows();
     int getColumns();
     
@@ -34,8 +34,10 @@ public:
     Tensor operator&(Tensor&);
     Tensor operator+(Tensor&);
     Tensor operator-(Tensor&);
+    Tensor operator/(Tensor&);
     double& operator()(int, int);
 private:
     int rows, columns;
+    bool parallel;
     std::vector<std::vector<double>> values;
 };   

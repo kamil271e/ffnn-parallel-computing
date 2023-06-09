@@ -15,7 +15,7 @@ void Digit::display(){ // pretty printing
     }
 }
 
-std::vector<Digit> loadMNIST(std::string path, int n_samples) {
+std::vector<Digit> loadMNIST(std::string path, int n_samples, bool parallel=false) {
     std::vector<Digit> digits;
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -33,7 +33,7 @@ std::vector<Digit> loadMNIST(std::string path, int n_samples) {
         std::getline(iss, token, ',');
         int label = std::stoi(token);
 
-        Tensor img = Tensor(28, 28);
+        Tensor img = Tensor(28, 28, parallel);
         int j = 0;
         while (std::getline(iss, token, ',')) {
             double pixel = std::stod(token) / 255.0; // pixel normalization

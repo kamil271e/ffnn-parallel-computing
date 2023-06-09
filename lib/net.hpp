@@ -6,7 +6,7 @@
 
 class NeuralNetwork {
 public:
-    NeuralNetwork(int, int, int, double);
+    NeuralNetwork(int, int, int, double, bool parallel=false);
     void init_weights();
     double fit(std::vector<Digit>);
     void forward_propagation(Digit);
@@ -28,4 +28,5 @@ private:
     Tensor labels;
     double lr;
     int accurate_pred;
+    bool parallel;
 };

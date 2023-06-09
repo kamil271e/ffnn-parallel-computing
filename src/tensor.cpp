@@ -3,9 +3,10 @@
 
 Tensor::Tensor(){}
 
-Tensor::Tensor(int rows, int columns) {
+Tensor::Tensor(int rows, int columns, bool parallel) {
     this->rows = rows;
     this->columns = columns;
+    this->parallel = parallel;
     values.resize(rows, std::vector<double>(columns));
 }
 
@@ -154,6 +155,7 @@ double Tensor::minval(int axis) {
 }
 
 void Tensor::relu() {
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
             values[i][j] = (values[i][j] > 0) ? values[i][j] : 0; 
@@ -162,6 +164,7 @@ void Tensor::relu() {
 }
 
 void Tensor::reluDerivative() {
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             values[i][j] = (values[i][j] <= 0.0) ? 0.0 : 1.0;
@@ -233,8 +236,10 @@ void Tensor::crossEntropyError(Tensor labels){
     values = std::move(err);
 }
 
+
 Tensor Tensor::operator*(double scalar){ // SCALING
-    Tensor finalTensor(rows, columns);
+    Tensor finalTensor(rows, columns, parallel);
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
             finalTensor(i,j) = values[i][j] * scalar;
@@ -250,8 +255,9 @@ Tensor Tensor::operator*(Tensor& T){ // DOT PRODUCT
     }
     int finalRows = rows;
     int finalColumns = T.getColumns();
-    Tensor finalTensor(finalRows, finalColumns);
+    Tensor finalTensor(finalRows, finalColumns, parallel);
 
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < finalRows; i++) {
         for (int j = 0; j < finalColumns; j++) {
             double sum = 0.0;
@@ -269,8 +275,9 @@ Tensor Tensor::operator&(Tensor& T){// ELEMENT-WISE MULTIPLICATION
         std::cout << "Element-wise multiplication failed. Incompatible dimensions" <<std::endl;
         return Tensor();
     }
-    Tensor finalTensor(rows, columns);
+    Tensor finalTensor(rows, columns, parallel);
 
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double product =  values[i][j] * T(i, j);
@@ -285,8 +292,9 @@ Tensor Tensor::operator+(Tensor& T){ // ADD
         std::cout << "Add operation failed. Incompatible dimensions" << std::endl;
         return Tensor();
     }
-    Tensor finalTensor(rows, columns);
-
+    Tensor finalTensor(rows, columns, parallel);
+  
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double add_result = values[i][j] + T(i,j);
@@ -301,8 +309,9 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
         std::cout << "Substract operation failed. Incompatible dimensions" << std::endl;
         return Tensor();
     }
-    Tensor finalTensor(rows, columns);
+    Tensor finalTensor(rows, columns, parallel);
 
+    #pragma omp parallel for if(parallel)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double substract_result = values[i][j] - T(i,j);
@@ -311,6 +320,24 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
     }
     return finalTensor;
 }
+
+Tensor Tensor::operator/(Tensor& T){
+    if (columns != T.getColumns() || rows != T.getRows()){
+        std::cout << "Element-wise division failed. Incompatible dimensions" <<std::endl;
+        return Tensor();
+    }
+    Tensor finalTensor(rows, columns, parallel);
+
+    #pragma omp parallel for if(parallel)
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            double quotient  = values[i][j] / T(i,j);
+            finalTensor(i,j) = quotient ;
+        }
+    }
+    return finalTensor;
+}
+
 
 double& Tensor::operator()(int i, int j) {
     return values[i][j];
