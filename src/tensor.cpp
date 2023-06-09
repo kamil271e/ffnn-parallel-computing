@@ -1,6 +1,5 @@
 #include "../lib/tensor.hpp"
 #include <random>
-#define NUM_THREADS 12
 
 Tensor::Tensor(){}
 
