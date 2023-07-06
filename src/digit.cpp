@@ -1,5 +1,6 @@
 #include "../lib/digit.hpp"
 
+Digit::Digit(){}
 
 Digit::Digit(Tensor& data, int label)
     : data(data), label(label) {}
@@ -15,8 +16,10 @@ void Digit::display(){ // pretty printing
     }
 }
 
-std::vector<Digit> loadMNIST(std::string path, int n_samples, bool parallel=false) {
-    std::vector<Digit> digits;
+Digit* loadMNIST(std::string path, int n_samples, bool parallel=false) {
+    Digit* digits = new Digit[n_samples];
+    Tensor img(28, 28, parallel);
+
     std::ifstream file(path);
     if (!file.is_open()) {
         std::cout << "Failed to open: " << path << std::endl;
@@ -32,16 +35,15 @@ std::vector<Digit> loadMNIST(std::string path, int n_samples, bool parallel=fals
 
         std::getline(iss, token, ',');
         int label = std::stoi(token);
-
-        Tensor img = Tensor(28, 28, parallel);
+       
         int j = 0;
         while (std::getline(iss, token, ',')) {
             double pixel = std::stod(token) / 255.0; // pixel normalization
             img(j/28, j%28) = pixel;
             j++;
         }
-        Digit digit(img, label);
-        digits.push_back(digit);
+        Tensor imgCopy = img; // DeepCopy
+        new (&digits[i]) Digit(imgCopy, label);
         i++;
     }
 

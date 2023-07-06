@@ -8,10 +8,10 @@ class NeuralNetwork {
 public:
     NeuralNetwork(int, int, int, double, bool parallel=false);
     void init_weights();
-    double fit(std::vector<Digit>);
+    double fit(Digit*, int);
     void forward_propagation(Digit);
     void backward_propagation(int);
-    double predict(std::vector<Digit>);
+    double predict(Digit*, int);
     void save_weights(std::string);
     void load_weights(std::string);
 private:

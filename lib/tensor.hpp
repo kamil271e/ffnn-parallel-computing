@@ -7,6 +7,10 @@ class Tensor {
 public:
     Tensor();
     Tensor(int, int, bool parallel=false);
+    Tensor(Tensor&);
+    ~Tensor();
+    void allocate();
+    void deallocate();
     int getRows();
     int getColumns();
     
@@ -39,5 +43,5 @@ public:
 private:
     int rows, columns;
     bool parallel;
-    std::vector<std::vector<double>> values;
+    double** values;
 };   

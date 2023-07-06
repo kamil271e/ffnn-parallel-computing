@@ -7,6 +7,7 @@
 
 class Digit {
 public:
+    Digit();
     Digit(Tensor&, int);
     void display();
     Tensor data;  

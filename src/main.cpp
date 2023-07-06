@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     int train_size, threads_num, input_size, num_classes, neurons;
     bool parallel;
     double lr, start, stop, duration, accuracy; 
-    std::vector<Digit> train_set;
+    Digit* train_set;
 
     input_size = 28*28;
     num_classes = 10;
@@ -23,18 +23,30 @@ int main(int argc, char** argv){
     } else{
         parallel = false;
     }
+    train_set = new Digit[train_size];
     train_set = loadMNIST("datasets/mnist_train.csv", train_size, parallel);
+    std::cout << train_set[10].label << std::endl;
+    train_set[10].display();
 
     if (argc < 5){ // REGULAR TRAINING
         neurons = std::stoi(argv[3]);
+        std::cout<<"before nn created"<<std::endl;
         NeuralNetwork model(input_size, neurons, num_classes, lr, parallel);
-        
+        std::cout<<"nn created"<<std::endl;
         start = omp_get_wtime();
-        accuracy = model.fit(train_set);
+        accuracy = model.fit(train_set, train_size);
         stop = omp_get_wtime();
         
-        duration = stop -start;       
+        duration = stop - start;       
         std::cout << "Execution time: " << duration << " ; Accuracy: " << accuracy << std::endl;
+    
+        int test_size = 200;
+        Digit* test_set = new Digit[test_size];
+        test_set = loadMNIST("datasets/mnist_test.csv", test_size, parallel);
+
+        accuracy = model.predict(test_set, test_size);
+        std::cout << accuracy << std::endl;
+    
     }
     else{ // TESTING FOR DIFFERENT TRAIN SIZES
         std::string path = "times/" + std::to_string(train_size) + "/" + std::to_string(threads_num) + ".txt";
@@ -50,7 +62,7 @@ int main(int argc, char** argv){
             NeuralNetwork model(input_size, neurons, num_classes, lr, parallel);
             
             start = omp_get_wtime();
-            accuracy = model.fit(train_set);
+            accuracy = model.fit(train_set, train_size);
             stop = omp_get_wtime();
             duration = stop - start;    
 
@@ -62,5 +74,6 @@ int main(int argc, char** argv){
         file.close();
     }
     
+    delete[] train_set;
     return 0;
 }

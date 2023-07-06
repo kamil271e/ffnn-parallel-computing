@@ -7,7 +7,39 @@ Tensor::Tensor(int rows, int columns, bool parallel) {
     this->rows = rows;
     this->columns = columns;
     this->parallel = parallel;
-    values.resize(rows, std::vector<double>(columns));
+    allocate();
+    // values.resize(rows, std::vector<double>(columns));
+}
+
+// Copy constructor
+Tensor::Tensor(Tensor& T) : rows(T.rows), columns(T.columns) {
+    values = new double*[rows];
+    for (int i = 0; i < rows; ++i) {
+        values[i] = new double[columns];
+        for (int j = 0; j < columns; ++j) {
+            values[i][j] = T(i,j);
+        }
+    }
+}
+
+Tensor::~Tensor(){
+    deallocate();
+}
+
+// Allocate memory for values of tensor
+void Tensor::allocate(){
+    values = new double*[rows];
+    for(int i = 0; i < columns; i++){
+        values[i] = new double[columns];
+    }
+}
+
+// Free memory of tensor
+void Tensor::deallocate(){
+    for (int i = 0; i < rows; i++){
+        delete[] values[i];
+    }
+    delete[] values;
 }
 
 int Tensor::getColumns(){
@@ -53,54 +85,58 @@ void Tensor::ones(){
     }
 }
 
+// Display tensor values
 void Tensor::display() {
     for (int i = 0; i < rows; i++) {
-            std::cout << "[ ";
-            for (int j = 0; j < columns; j++) {
-                std::cout << values[i][j] << " ";
-            } std::cout << "]" << std::endl;
-        } 
+        std::cout << "[ ";
+        for (int j = 0; j < columns; j++) {
+            std::cout << values[i][j] << " ";
+        } std::cout << "]" << std::endl;
+    } 
 }
 
 void Tensor::transpose() {
-    std::vector<std::vector<double>> transposed(columns, std::vector<double>(rows));
+    // double **transposed = new double[columns][rows];
+    Tensor transposed(columns, rows);
+    //std::vector<std::vector<double>> transposed(columns, std::vector<double>(rows));
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            transposed[j][i] = values[i][j];
+            transposed(j,i) = values[i][j];
         }
     }
     std::swap(rows, columns);
-    values = std::move(transposed);
+    values = std::move(transposed.values);
 }
 
 // numpy based: axis=0 -> column vector
 // axis=1 -> row vector
 void Tensor::flatten(int axis) {
     int n = rows * columns;
-    std::vector<std::vector<double>> flattened;
-    if (axis==0){
-        flattened.resize(n, std::vector<double>(1));
+    // std::vector<std::vector<double>> flattened;
+    Tensor flattened;
+    if (axis == 0){
+        flattened = Tensor(n, 1);
+        // flattened.resize(n, std::vector<double>(1));
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                flattened[i * columns + j][0] = values[i][j];
+                flattened(i * columns + j, 0) = values[i][j];
             }
         }
-        rows=n;
-        columns=1;
-    } else if(axis==1){
-        flattened.resize(1, std::vector<double>(n));
+        rows = n; columns = 1;
+    } else if(axis == 1){
+        // flattened.resize(1, std::vector<double>(n));
+        flattened = Tensor(1, n);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                flattened[0][i * columns + j] = values[i][j];
+                flattened(0, i * columns + j) = values[i][j];
             }
         }
-        rows=1;
-        columns=n;
+        rows = 1; columns = n;
     }else{
         std::cout << "Flatten operation failed. Axis parameter should be 0 or 1." << std::endl;
         return;
     }
-    values = std::move(flattened);
+    values = std::move(flattened.values);
 }
 
 int Tensor::argmax(int axis) {
@@ -191,22 +227,23 @@ void Tensor::sigmoidDerivative(){ // (1 - sigm(x)) * sigm(x) for each x
 }
 
 void Tensor::softmax(){
-    std::vector<std::vector<double>> probas(rows, std::vector<double>(columns));
+    // std::vector<std::vector<double>> probas(rows, std::vector<double>(columns));
+    Tensor probas(rows, columns);
     double sumExp = 0.0;
 
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < columns; j++){
             double expV = std::exp(values[i][j]);
-            probas[i][j] = expV;
+            probas(i,j) = expV;
             sumExp += expV;
         }
     }
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            probas[i][j] /= sumExp;
+            probas(i,j) /= sumExp;
         }
     }
-    values = std::move(probas);
+    values = std::move(probas.values);
 }
 
 void Tensor::softmaxDerivative() {
@@ -222,18 +259,17 @@ void Tensor::oneHotEncoding(int label){
 }
 
 void Tensor::crossEntropyError(Tensor labels){
-    std::vector<std::vector<double>> err(rows, std::vector<double>(columns));
-
+    Tensor err(rows, columns);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             double label = labels(i, j);
             double prediction = values[i][j];
             const double epsilon = 1e-7; // in case prediciton = 0
             prediction = std::max(epsilon, prediction); 
-            err[i][j] = -label * std::log(prediction);
+            err(i,j) = -label * std::log(prediction);
         }
     }
-    values = std::move(err);
+    values = std::move(err.values);
 }
 
 
