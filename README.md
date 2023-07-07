@@ -1,5 +1,5 @@
 # ffnn-parallel-computing
-Simple feed forward neural network written in C++ leverages OpenMP to parallelize calculations. Assignment for Parallel Processing Classes at Poznan University of Technology.
+Feed forward neural network written in C++ leverages OpenMP to parallelize calculations, designed to classify hand written digits from MNIST dataset. Assignment for Parallel Processing classes at Poznan University of Technology.
 
 ### Results
 
