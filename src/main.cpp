@@ -25,16 +25,13 @@ int main(int argc, char** argv){
     }
     train_set = new Digit[train_size];
     train_set = loadMNIST("datasets/mnist_train.csv", train_size, parallel);
-    std::cout << train_set[10].label << std::endl;
-    train_set[10].display();
 
     if (argc < 5){ // REGULAR TRAINING
         neurons = std::stoi(argv[3]);
-        std::cout<<"before nn created"<<std::endl;
         NeuralNetwork model(input_size, neurons, num_classes, lr, parallel);
-        std::cout<<"nn created"<<std::endl;
         start = omp_get_wtime();
         accuracy = model.fit(train_set, train_size);
+        std::cout << "after fit" << std::endl;
         stop = omp_get_wtime();
         
         duration = stop - start;       

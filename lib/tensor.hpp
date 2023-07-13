@@ -8,7 +8,7 @@ public:
     Tensor();
     Tensor(int, int, bool parallel=false);
     Tensor(Tensor&);
-    ~Tensor();
+    // ~Tensor();
     void allocate();
     void deallocate();
     int getRows();

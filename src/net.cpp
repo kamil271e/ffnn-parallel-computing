@@ -42,7 +42,8 @@ double NeuralNetwork::predict(Digit* digits, int num_digits){
 void NeuralNetwork::forward_propagation(Digit digit){
     inputs = digit.data;
     inputs.flatten();
-
+    // std::cout<<"after flatten" << std::endl;
+    // inputs.display();
     hidden_outputs = hidden_weights * inputs;
     hidden_outputs.relu();
 

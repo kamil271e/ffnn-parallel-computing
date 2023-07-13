@@ -5,7 +5,6 @@ Digit::Digit(){}
 Digit::Digit(Tensor& data, int label)
     : data(data), label(label) {}
 
-
 void Digit::display(){ // pretty printing
     // data.display();
     for (int i = 0; i < data.getRows(); i++){
@@ -18,7 +17,6 @@ void Digit::display(){ // pretty printing
 
 Digit* loadMNIST(std::string path, int n_samples, bool parallel=false) {
     Digit* digits = new Digit[n_samples];
-    Tensor img(28, 28, parallel);
 
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -30,6 +28,7 @@ Digit* loadMNIST(std::string path, int n_samples, bool parallel=false) {
     std::getline(file, row);
     int i = 0;
     while (std::getline(file, row) && i < n_samples) {
+        Tensor img(28, 28, parallel);
         std::istringstream iss(row);
         std::string token;
 
@@ -42,11 +41,9 @@ Digit* loadMNIST(std::string path, int n_samples, bool parallel=false) {
             img(j/28, j%28) = pixel;
             j++;
         }
-        Tensor imgCopy = img; // DeepCopy
-        new (&digits[i]) Digit(imgCopy, label);
+        new (&digits[i]) Digit(img, label);
         i++;
     }
-
     file.close();
     return digits;
 }

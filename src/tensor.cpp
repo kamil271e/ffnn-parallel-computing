@@ -8,6 +8,7 @@ Tensor::Tensor(int rows, int columns, bool parallel) {
     this->columns = columns;
     this->parallel = parallel;
     allocate();
+    // std::cout <<"allocate " << rows << " " << columns << std::endl; 
     // values.resize(rows, std::vector<double>(columns));
 }
 
@@ -22,14 +23,14 @@ Tensor::Tensor(Tensor& T) : rows(T.rows), columns(T.columns) {
     }
 }
 
-Tensor::~Tensor(){
-    deallocate();
-}
+// Tensor::~Tensor(){
+//     deallocate();
+// }
 
 // Allocate memory for values of tensor
 void Tensor::allocate(){
     values = new double*[rows];
-    for(int i = 0; i < columns; i++){
+    for(int i = 0; i < rows; i++){
         values[i] = new double[columns];
     }
 }
@@ -96,7 +97,6 @@ void Tensor::display() {
 }
 
 void Tensor::transpose() {
-    // double **transposed = new double[columns][rows];
     Tensor transposed(columns, rows);
     //std::vector<std::vector<double>> transposed(columns, std::vector<double>(rows));
     for (int i = 0; i < rows; i++) {
@@ -115,17 +115,18 @@ void Tensor::flatten(int axis) {
     // std::vector<std::vector<double>> flattened;
     Tensor flattened;
     if (axis == 0){
-        flattened = Tensor(n, 1);
-        // flattened.resize(n, std::vector<double>(1));
+        flattened = Tensor(n, 1, parallel);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
+                // std::cout <<"assign 0" << std::endl;
                 flattened(i * columns + j, 0) = values[i][j];
+                // std::cout <<"assign 1" << std::endl;
             }
         }
         rows = n; columns = 1;
     } else if(axis == 1){
         // flattened.resize(1, std::vector<double>(n));
-        flattened = Tensor(1, n);
+        flattened = Tensor(1, n, parallel);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 flattened(0, i * columns + j) = values[i][j];
@@ -136,6 +137,7 @@ void Tensor::flatten(int axis) {
         std::cout << "Flatten operation failed. Axis parameter should be 0 or 1." << std::endl;
         return;
     }
+    // std::cout << "right before std::move" << std::endl;
     values = std::move(flattened.values);
 }
 
@@ -359,7 +361,7 @@ Tensor Tensor::operator-(Tensor& T){ // SUBSTRACT
 
 Tensor Tensor::operator/(Tensor& T){
     if (columns != T.getColumns() || rows != T.getRows()){
-        std::cout << "Element-wise division failed. Incompatible dimensions" <<std::endl;
+        std::cout << "Element-wise division failed. Incompatible dimensions" << std::endl;
         return Tensor();
     }
     Tensor finalTensor(rows, columns, parallel);
